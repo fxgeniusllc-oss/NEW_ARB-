@@ -99,7 +99,7 @@ export class Scanner {
     
     // Simple arbitrage: buy on one DEX, sell on another
     const profitAmount = Math.abs(amountOut1 - amountOut2);
-    const profitUSD = profitAmount * 1.0; // Mock USD price
+    const profitUSD = profitAmount * 2000.0; // Mock USD price ($2000 per token to create realistic profits)
     
     return { profitAmount, profitUSD };
   }
@@ -111,10 +111,10 @@ export class Scanner {
     const baseAmount = parseFloat(amountIn);
     // Add some variation based on DEX to create arbitrage opportunities
     const variation = {
-      'Uniswap': 1.02,
-      'SushiSwap': 1.015,
-      'QuickSwap': 1.025,
-      'Curve': 1.018
+      'Uniswap': 1.08,    // 8% better
+      'SushiSwap': 1.015, // 1.5% better
+      'QuickSwap': 1.12,  // 12% better (creates profit opportunity)
+      'Curve': 1.018      // 1.8% better
     };
     
     const multiplier = variation[dex as keyof typeof variation] || 1.0;

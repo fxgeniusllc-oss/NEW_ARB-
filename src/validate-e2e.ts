@@ -1,12 +1,12 @@
 import { ethers } from 'ethers';
-import logger from '../utils/logger';
-import { config } from '../config/config';
-import { Scanner } from '../services/scanner';
-import { MLClient } from '../services/mlClient';
-import { TransactionBuilder } from '../services/transactionBuilder';
-import { TransactionBroadcaster } from '../services/broadcaster';
-import { GasOptimizer } from '../utils/gasOptimizer';
-import { ValidationResult, ArbitrageOpportunity, SignedTransaction } from '../utils/types';
+import logger from './utils/logger';
+import { config } from './config/config';
+import { Scanner } from './services/scanner';
+import { MLClient } from './services/mlClient';
+import { TransactionBuilder } from './services/transactionBuilder';
+import { TransactionBroadcaster } from './services/broadcaster';
+import { GasOptimizer } from './utils/gasOptimizer';
+import { ValidationResult, ArbitrageOpportunity, SignedTransaction } from './utils/types';
 
 export class E2EValidator {
   private provider: ethers.providers.JsonRpcProvider;
@@ -16,6 +16,7 @@ export class E2EValidator {
   private broadcaster: TransactionBroadcaster;
   private gasOptimizer: GasOptimizer;
   private results: ValidationResult[] = [];
+  private useMockProvider: boolean = false;
 
   constructor() {
     logger.info('Initializing E2E Validator', { 
@@ -23,7 +24,17 @@ export class E2EValidator {
       mode: config.executionMode 
     });
 
-    this.provider = new ethers.providers.JsonRpcProvider(config.rpcUrl);
+    // Use mock provider in simulation mode if RPC is unavailable
+    this.useMockProvider = config.executionMode === 'SIM';
+    
+    try {
+      this.provider = new ethers.providers.JsonRpcProvider(config.rpcUrl);
+    } catch (error) {
+      logger.warn('Failed to connect to RPC, using mock provider', { error });
+      this.useMockProvider = true;
+      this.provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+    }
+    
     this.gasOptimizer = new GasOptimizer(this.provider, config.maxGasPriceGwei);
     this.scanner = new Scanner(this.provider, config.minProfitUSD);
     this.mlClient = new MLClient(config.mlServerUrl);
@@ -127,7 +138,7 @@ export class E2EValidator {
         );
         logger.info(`✅ Detected ${opportunities.length} opportunities`);
         
-        opportunities.forEach((opp, idx) => {
+        opportunities.forEach((opp: ArbitrageOpportunity, idx: number) => {
           logger.info(`  Opportunity ${idx + 1}: ${opp.expectedProfitUSD.toFixed(2)} USD profit`);
         });
       } else {
@@ -256,7 +267,8 @@ export class E2EValidator {
       const signedTx = await this.txBuilder.signTransaction(payload);
 
       // Test MEV protection
-      const mevProtection = new (await import('./mevProtection')).MEVProtection(config.mevProtection);
+      const { MEVProtection } = await import('./services/mevProtection');
+      const mevProtection = new MEVProtection(config.mevProtection);
       const merkleData = mevProtection.buildMerkleTree([signedTx]);
       const protectedPayload = await mevProtection.prepareProtectedTransaction(signedTx, merkleData);
 

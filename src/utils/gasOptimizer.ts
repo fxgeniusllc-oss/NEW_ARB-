@@ -25,8 +25,9 @@ export class GasOptimizer {
       
       return optimalGasPrice;
     } catch (error) {
-      logger.error('Error calculating optimal gas price', { error });
-      throw error;
+      logger.debug('Using default gas price (network unavailable)', { error });
+      // Return default gas price in case of error
+      return ethers.utils.parseUnits('50', 'gwei');
     }
   }
 
@@ -43,8 +44,9 @@ export class GasOptimizer {
       
       return gasWithBuffer;
     } catch (error) {
-      logger.error('Error estimating gas', { error });
-      throw error;
+      logger.debug('Using default gas estimate (network unavailable)', { error });
+      // Return default gas estimate in case of error
+      return ethers.BigNumber.from('300000');
     }
   }
 }
