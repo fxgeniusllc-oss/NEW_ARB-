@@ -10,10 +10,16 @@ on:
     - cron: '0 2 * * *'
   workflow_dispatch:
 
+# Restrict default permissions for security
+permissions:
+  contents: read
+
 jobs:
   environment-setup:
     name: Environment Compatibility Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     strategy:
       matrix:
@@ -43,6 +49,9 @@ jobs:
     name: Full Integration Audit
     runs-on: ubuntu-latest
     needs: environment-setup
+    permissions:
+      contents: read
+      actions: write  # For uploading artifacts
     
     steps:
     - uses: actions/checkout@v4
@@ -89,6 +98,9 @@ jobs:
     name: Performance Benchmarks
     runs-on: ubuntu-latest
     needs: environment-setup
+    permissions:
+      contents: read
+      actions: write  # For uploading artifacts
     
     steps:
     - uses: actions/checkout@v4
@@ -125,6 +137,9 @@ jobs:
   security-audit:
     name: Security Audit
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write  # For uploading SARIF results
     
     steps:
     - uses: actions/checkout@v4
@@ -153,6 +168,9 @@ jobs:
   dependency-audit:
     name: Dependency Security Audit
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write  # For uploading artifacts
     
     steps:
     - uses: actions/checkout@v4
@@ -203,6 +221,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [integration-audit, performance-benchmark, security-audit, dependency-audit]
     if: always()
+    permissions:
+      contents: read
     
     steps:
     - name: Generate Summary
