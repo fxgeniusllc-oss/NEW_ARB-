@@ -1,0 +1,223 @@
+name: Integration Source Audit
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  environment-setup:
+    name: Environment Compatibility Check
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x, 20.x]
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Verify Node.js version
+      run: node --version
+    
+    - name: Verify Python version
+      run: python --version
+
+  integration-audit:
+    name: Full Integration Audit
+    runs-on: ubuntu-latest
+    needs: environment-setup
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Setup Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+        override: true
+    
+    - name: Make audit script executable
+      run: chmod +x scripts/audit-integration.sh
+    
+    - name: Run Integration Source Audit
+      id: audit
+      run: |
+        ./scripts/audit-integration.sh || echo "AUDIT_FAILED=true" >> $GITHUB_ENV
+      continue-on-error: true
+    
+    - name: Upload Audit Report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: integration-audit-report
+        path: audit-reports/
+        retention-days: 30
+    
+    - name: Check Audit Status
+      if: env.AUDIT_FAILED == 'true'
+      run: |
+        echo "::error::Integration audit failed! Please review the audit report."
+        exit 1
+
+  performance-benchmark:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+    needs: environment-setup
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Setup Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+        override: true
+    
+    - name: Make benchmark script executable
+      run: chmod +x scripts/performance-benchmark.sh
+    
+    - name: Run Performance Benchmarks
+      run: ./scripts/performance-benchmark.sh
+      continue-on-error: true
+    
+    - name: Upload Benchmark Report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: performance-benchmark-report
+        path: benchmark-results/
+        retention-days: 30
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy results to GitHub Security
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+    
+    - name: Check for secrets
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: ${{ github.event.repository.default_branch }}
+        head: HEAD
+
+  dependency-audit:
+    name: Dependency Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Audit Node.js dependencies
+      if: hashFiles('package.json') != ''
+      run: |
+        npm audit --audit-level=moderate || true
+        npm audit --json > npm-audit-report.json || true
+      continue-on-error: true
+    
+    - name: Audit Python dependencies
+      if: hashFiles('python/requirements.txt') != ''
+      run: |
+        pip install safety
+        safety check --json > python-safety-report.json || true
+      continue-on-error: true
+    
+    - name: Audit Rust dependencies
+      if: hashFiles('rust/Cargo.toml') != ''
+      run: |
+        cargo install cargo-audit
+        cd rust && cargo audit --json > ../rust-audit-report.json || true
+      continue-on-error: true
+    
+    - name: Upload dependency audit reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: dependency-audit-reports
+        path: |
+          *-audit-report.json
+          *-safety-report.json
+        retention-days: 30
+
+  summary:
+    name: Audit Summary
+    runs-on: ubuntu-latest
+    needs: [integration-audit, performance-benchmark, security-audit, dependency-audit]
+    if: always()
+    
+    steps:
+    - name: Generate Summary
+      run: |
+        echo "## Integration Source Audit Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Integration audit completed" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Performance benchmarks completed" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Security audit completed" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Dependency audit completed" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Review the artifacts for detailed reports." >> $GITHUB_STEP_SUMMARY
