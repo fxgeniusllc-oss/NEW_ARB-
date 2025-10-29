@@ -14,6 +14,8 @@ npm install
 npm run build
 
 # Run validation (simulation mode)
+# ⚠️  NOTE: The private key below is a TEST KEY ONLY - all zeros
+# NEVER use this or any real private key in documentation or scripts
 EXECUTION_MODE=SIM \
 POLYGON_RPC_URL=https://polygon-rpc.com \
 PRIVATE_KEY=0x0000000000000000000000000000000000000000000000000000000000000001 \
@@ -21,9 +23,15 @@ ML_SERVER_URL=http://localhost:8000 \
 node dist/index.js
 ```
 
+**Security Warning**: The private key shown above is a test key (all zeros + 1). In production:
+- NEVER commit real private keys
+- Use environment variables or secure vaults
+- Use proper testnet private keys for testing
+
 ## Test with MEV Protection
 
 ```bash
+# ⚠️  Replace TEST_PRIVATE_KEY with your own test key
 EXECUTION_MODE=SIM \
 POLYGON_RPC_URL=https://polygon-rpc.com \
 PRIVATE_KEY=0x0000000000000000000000000000000000000000000000000000000000000001 \
@@ -121,6 +129,6 @@ After validation passes:
 
 ## Documentation
 
-- [E2E_VALIDATION.md](../docs/E2E_VALIDATION.md) - Complete documentation
-- [ARCHITECTURE.md](../docs/ARCHITECTURE.md) - System architecture
-- [DEPLOYMENT.md](../docs/DEPLOYMENT.md) - Deployment guide
+- [E2E_VALIDATION.md](docs/E2E_VALIDATION.md) - Complete documentation
+- [ARCHITECTURE.md](docs/ARCHITECTURE.md) - System architecture
+- [DEPLOYMENT.md](docs/DEPLOYMENT.md) - Deployment guide

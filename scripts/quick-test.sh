@@ -17,10 +17,15 @@ fi
 
 echo "Running E2E validation in simulation mode..."
 echo ""
+echo "⚠️  Using test private key - DO NOT use in production!"
+echo ""
+
+# Use environment variable if set, otherwise use test key
+TEST_PRIVATE_KEY="${TEST_PRIVATE_KEY:-0x0000000000000000000000000000000000000000000000000000000000000001}"
 
 EXECUTION_MODE=SIM \
 POLYGON_RPC_URL=https://polygon-rpc.com \
-PRIVATE_KEY=0x0000000000000000000000000000000000000000000000000000000000000001 \
+PRIVATE_KEY="$TEST_PRIVATE_KEY" \
 ML_SERVER_URL=http://localhost:8000 \
 node dist/index.js
 
