@@ -101,7 +101,7 @@ echo ""
 yarn start
 
 # Cleanup
-if [ ! -z "$PYTHON_PID" ]; then
+if [ -n "$PYTHON_PID" ]; then
     echo ""
     echo "Shutting down services..."
     kill $PYTHON_PID 2>/dev/null || true
