@@ -119,6 +119,43 @@ cd python && python main.py
 yarn start
 ```
 
+## 🔍 Quality Assurance
+
+### Integration Source Audit
+
+Run comprehensive audits to ensure code quality and prevent regressions:
+
+```bash
+# Run full integration audit
+./scripts/audit-integration.sh
+
+# Run performance benchmarks
+./scripts/performance-benchmark.sh
+```
+
+The audit framework validates:
+- ✅ Environment compatibility (Node.js, Python, Rust)
+- ✅ Security vulnerabilities and best practices
+- ✅ Code structure and organization
+- ✅ Test coverage and quality
+- ✅ Documentation completeness
+- ✅ Dependency management
+- ✅ Performance benchmarks
+
+For detailed information, see:
+- **[Integration Audit Documentation](docs/INTEGRATION_AUDIT.md)** - Complete audit framework guide
+- **[QA Guide](docs/QA_GUIDE.md)** - Quality assurance best practices
+
+### Continuous Integration
+
+GitHub Actions automatically runs:
+- Integration source audits on every push
+- Performance benchmarks weekly
+- Security vulnerability scans
+- Dependency audits
+
+Check the **Actions** tab for CI/CD status and reports.
+
 ## 📝 License
 
 [Insert License Information]
@@ -129,6 +166,8 @@ yarn start
 - [MEV Protection](https://docs.flashbots.net/)
 - [Ethers.js Documentation](https://docs.ethers.io/)
 - [Web3.py Documentation](https://web3py.readthedocs.io/)
+- [Integration Audit Guide](docs/INTEGRATION_AUDIT.md)
+- [QA Best Practices](docs/QA_GUIDE.md)
 
 ## 📞 Support
 
@@ -136,6 +175,7 @@ For issues and questions:
 - Open an issue on GitHub
 - Check existing documentation in `/docs`
 - Review code comments for implementation details
+- Run integration audit for health checks: `./scripts/audit-integration.sh`
 
 ## ⚠️ Important Notice
 
