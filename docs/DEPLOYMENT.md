@@ -2,6 +2,20 @@
 
 ## 🚀 Deployment
 
+### Quick Start Scripts
+
+For automated installation and startup:
+
+**Linux/macOS:**
+```bash
+./scripts/install-and-run.sh
+```
+
+**Windows:**
+```batch
+scripts\install-and-run.bat
+```
+
 ### Development Mode
 
 ```bash
@@ -33,6 +47,20 @@ The system includes built-in monitoring and logging:
 Logs are written to `logs/system.log` and can be monitored in real-time.
 
 ## 🧪 Testing
+
+### Quick Validation
+
+Run all tests with the validation script:
+
+**Linux/macOS:**
+```bash
+./scripts/validate-all.sh
+```
+
+**Windows:**
+```batch
+scripts\validate-all.bat
+```
 
 ### TypeScript Tests
 

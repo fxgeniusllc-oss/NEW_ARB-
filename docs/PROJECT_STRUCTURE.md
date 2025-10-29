@@ -52,9 +52,12 @@ APEX-ARBITRAGE-SYSTEM/
 │       └── preprocess.py           # Scaling + normalization
 │
 ├── scripts/
-│   ├── install-and-run.sh         # One-click launcher
-│   ├── validate-all.sh            # End-to-end system check
-│   └── train-ml-models.py         # Bootstraps model training
+│   ├── install-and-run.sh         # One-click launcher (Linux/macOS)
+│   ├── install-and-run.bat        # One-click launcher (Windows)
+│   ├── validate-all.sh            # End-to-end system check (Linux/macOS)
+│   ├── validate-all.bat           # End-to-end system check (Windows)
+│   ├── train-ml-models.py         # Bootstraps model training
+│   └── README.md                  # Scripts documentation
 │
 ├── docs/
 │   ├── APEX-SETUP.md
@@ -119,10 +122,11 @@ Machine learning and AI inference layer.
 
 ### Scripts (`scripts/`)
 
-Automation and utility scripts:
-- **install-and-run.sh**: Automated installation and startup
-- **validate-all.sh**: End-to-end system validation
+Automation and utility scripts for both Linux/macOS and Windows:
+- **install-and-run.sh / install-and-run.bat**: Automated installation and startup
+- **validate-all.sh / validate-all.bat**: End-to-end system validation
 - **train-ml-models.py**: ML model training bootstrap
+- **README.md**: Detailed scripts documentation
 
 ### Documentation (`docs/`)
 
