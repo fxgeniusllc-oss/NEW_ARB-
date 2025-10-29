@@ -333,7 +333,7 @@ audit_security() {
     
     # Check for private keys in code
     PRIVATE_KEY_FOUND=false
-    if grep -r "PRIVATE_KEY.*=.*0x[a-fA-F0-9]\{64\}" . --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist 2>/dev/null | grep -v ".env.example" | grep -q .; then
+    if grep -rE "PRIVATE_KEY.*=.*0x[a-fA-F0-9]{64}" . --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist 2>/dev/null | grep -v ".env.example" | grep -q .; then
         print_failure "Potential private keys found in code!"
         log_to_report "- ✗ Potential private keys detected in code\n"
         PRIVATE_KEY_FOUND=true
