@@ -32,6 +32,30 @@ For detailed information about the system, please refer to:
 
 ### Installation
 
+#### Automated Installation (Recommended)
+
+**Linux/macOS:**
+```bash
+# Clone the repository
+git clone https://github.com/fxgeniusllc-oss/NEW_ARB-.git
+cd NEW_ARB-
+
+# Run automated installation and startup
+./scripts/install-and-run.sh
+```
+
+**Windows:**
+```batch
+# Clone the repository
+git clone https://github.com/fxgeniusllc-oss/NEW_ARB-.git
+cd NEW_ARB-
+
+# Run automated installation and startup
+scripts\install-and-run.bat
+```
+
+#### Manual Installation
+
 ```bash
 # Clone the repository
 git clone https://github.com/fxgeniusllc-oss/NEW_ARB-.git
