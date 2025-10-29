@@ -121,6 +121,30 @@ yarn start
 
 ## 🔍 Quality Assurance
 
+### End-to-End Validation
+
+The system includes comprehensive end-to-end validation:
+
+```bash
+# Quick validation test (simulation mode)
+npm run build
+EXECUTION_MODE=SIM \
+POLYGON_RPC_URL=https://polygon-rpc.com \
+PRIVATE_KEY=0x0000000000000000000000000000000000000000000000000000000000000001 \
+ML_SERVER_URL=http://localhost:8000 \
+node dist/index.js
+```
+
+See [VALIDATION_QUICKSTART.md](VALIDATION_QUICKSTART.md) for detailed validation instructions.
+
+The validation system tests:
+- ✅ Data fetch from multiple DEXes
+- ✅ Arbitrage opportunity detection and calculation
+- ✅ ML-powered opportunity scoring
+- ✅ Transaction payload building and signing
+- ✅ MEV protection with Merkle trees (BloxRoute/QuickNode/Flashbots)
+- ✅ Transaction broadcasting to blockchain
+
 ### Integration Source Audit
 
 Run comprehensive audits to ensure code quality and prevent regressions:
